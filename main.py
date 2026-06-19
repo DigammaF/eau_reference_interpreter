@@ -71,20 +71,18 @@ def make_filter(filter_str: str) -> Filter|None:
 def main():
     conn = mariadb.connect(**MARIADB_CONFIG)
 
-    for row in conn.cursor().execute(f"SELECT (refqual, limitequal, valtraduite) FROM {SOURCE_TABLE}"):
-        refqual: str = row[0]
-        limitequal: str = row[1]
-        valtraduite: float = float(row[2])
+    for row in conn.cursor().execute(f"SELECT CodeReseau, CodeSandreParametre, JourPrelevement, ReferencePrelevement, ValeurTraduite, ValeurReference, ValeurLimite FROM Mesure"):
+        codreseau, codesandreparametre, jourprelevement, referenceprelevement, valtraduite, valref, vallimite = row
 
-        limit_filter = make_filter(limitequal)
-        ref_filter = make_filter(refqual)
+        limit_filter = make_filter(vallimite)
+        ref_filter = make_filter(valref)
 
         limit_check = limit_filter.check(valtraduite) if limit_filter else None
         ref_check = ref_filter.check(valtraduite) if ref_filter else None
 
         conn.cursor().execute(
-            f"UPDATE Mesure SET limit_check = ?, ref_check = ? WHERE (refqual, limitequal, valtraduite) = (?, ?, ?)",
-            (limit_check, ref_check, refqual, limitequal, valtraduite)
+            f"UPDATE {SOURCE_TABLE} SET ConformiteLimite = ?, ConformiteReference = ? WHERE CodeReseau = ? AND CodeSandreParametre = ? AND JourPrelevement = ? AND ReferencePrelevement = ?",
+            (limit_check, ref_check, codreseau, codesandreparametre, jourprelevement, referenceprelevement)
         )
 
 
