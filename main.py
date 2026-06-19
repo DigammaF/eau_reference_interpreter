@@ -12,7 +12,6 @@ MARIADB_CONFIG = {
     "port": 3306,
     "database": ""
 }
-SOURCE_TABLE = "plv"
 
 LEQ_REGEX = re.compile(r"<=(?P<bound>\d+(?:,\d+)?)")
 MEQ_REGEX = re.compile(r">=(?P<bound>\d+(?:,\d+)?)")
@@ -81,7 +80,7 @@ def main():
         ref_check = ref_filter.check(valtraduite) if ref_filter else None
 
         conn.cursor().execute(
-            f"UPDATE {SOURCE_TABLE} SET ConformiteLimite = ?, ConformiteReference = ? WHERE CodeReseau = ? AND CodeSandreParametre = ? AND JourPrelevement = ? AND ReferencePrelevement = ?",
+            f"UPDATE Mesure SET ConformiteLimite = ?, ConformiteReference = ? WHERE CodeReseau = ? AND CodeSandreParametre = ? AND JourPrelevement = ? AND ReferencePrelevement = ?",
             (limit_check, ref_check, codreseau, codesandreparametre, jourprelevement, referenceprelevement)
         )
 
